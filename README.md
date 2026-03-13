@@ -9,13 +9,6 @@
 Veltrex is a professional-grade autonomous trading simulation system powered by **Q-Learning** reinforcement AI. It observes live market conditions, analyzes volatility, and executes trades (CALL/PUT) with a strategy that continuously evolves through experience.
 
 
-https://github.com/user-attachments/assets/87bfa959-7fa3-4009-932c-f4acacbcca78
-
-
-
-https://github.com/user-attachments/assets/97cadc55-9137-495d-b67b-3c33f392cae1
-
-
 [**Explore Documentation**](DOCUMENTATION.md) | [**View Demo Video**](#visual-demo)
 
 ---
@@ -25,9 +18,7 @@ https://github.com/user-attachments/assets/97cadc55-9137-495d-b67b-3c33f392cae1
 ### Watch the Bot in Action
 
 <div align="center">
-  <video src="https://github.com/ELMER369-code/veltrex/raw/main/veltrex-demo.mp4" width="100%" controls autoplay muted loop>
-    Your browser does not support the video tag.
-  </video>
+  https://github.com/user-attachments/assets/87bfa959-7fa3-4009-932c-f4acacbcca78
 </div>
 
 > [!NOTE]
