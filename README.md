@@ -9,7 +9,13 @@
 Veltrex is a professional-grade autonomous trading simulation system powered by **Q-Learning** reinforcement AI. It observes live market conditions, analyzes volatility, and executes trades (CALL/PUT) with a strategy that continuously evolves through experience.
 
 
-[**Explore Documentation**](DOCUMENTATION.md) | [**View Demo Video**](#visual-demo) | [**Download for Windows**](veltrex-future-trading_1.0.0_x64-setup.exe)
+[**Explore Documentation**](DOCUMENTATION.md) | [**View Demo Video**](#visual-demo)
+
+<p align="center">
+  <a href="veltrex-future-trading_1.0.0_x64-setup.exe">
+    <img src="https://img.shields.io/badge/DOWNLOAD_FOR_WINDOWS-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows" />
+  </a>
+</p>
 
 ---
 
