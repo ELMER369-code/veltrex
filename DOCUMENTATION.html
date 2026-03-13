@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Trading Bot Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #fff;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+        }
+
+        /* Table styles moved inline for Word compatibility */
+
+        th,
+        td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .note {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Future Trading Bot - Technical Documentation</h1>
+
+    <h2>Project Information</h2>
+    <table border="1" cellpadding="10" cellspacing="0"
+        style="border-collapse: collapse; width: 100%; border: 1px solid #ddd;">
+        <tr>
+            <th style="background-color: #f8f9fa; text-align: left;">Field</th>
+            <th style="background-color: #f8f9fa; text-align: left;">Value</th>
+        </tr>
+        <tr>
+            <td><strong>Project Name</strong></td>
+            <td><strong>Veltrex</strong> (Future Trading Bot)</td>
+        </tr>
+        <tr>
+            <td><strong>Version</strong></td>
+            <td>1.0.0</td>
+        </tr>
+        <tr>
+            <td><strong>Platform</strong></td>
+            <td>Windows Desktop (Tauri + React)</td>
+        </tr>
+        <tr>
+            <td><strong>Authors / System Architects</strong></td>
+            <td>Elmerio S. Talara, Trisha Ann Dahab, Venice Cabillada</td>
+        </tr>
+        <tr>
+            <td><strong>Institution</strong></td>
+            <td>Bohol Island State University - Main Campus</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <h2>1. Project Identity and Origin</h2>
+    <h3>1.1 The Name "VELTREX"</h3>
+    <p>The software is named <strong>VELTREX</strong>, a unique identifier derived from the names of its system
+        architects:</p>
+    <ul>
+        <li><strong>V</strong> — Venice</li>
+        <li><strong>EL</strong> — Elmerio</li>
+        <li><strong>TR</strong> — Trisha</li>
+        <li><strong>EX</strong> — <strong>Automated EXecution</strong></li>
+    </ul>
+    <p>The suffix <strong>"EX"</strong> symbolizes the core purpose of the system: the <strong>Autonomous
+            Execution</strong> of trades based on algorithmic decisions, removing human error and emotional bias from
+        the equation.</p>
+
+    <h2>2. Executive Summary</h2>
+    <p>The Future Trading Bot is an autonomous trading simulation system powered by <strong>Q-Learning</strong>, a
+        model-free reinforcement learning algorithm. The bot observes market conditions, makes trading decisions (CALL,
+        PUT, or HOLD), and continuously improves its strategy by learning from the outcomes of its actions.</p>
+    <p>This document provides a comprehensive explanation of the Q-Learning algorithm, the Q-Matrix data structure, and
+        how the system implements <strong>Double Deep Q-Network (DDQN)</strong> principles with <strong>Experience
+            Replay</strong> for stable and efficient learning.</p>
+
+    <h2>2. Introduction to Reinforcement Learning</h2>
+
+    <h3>2.1 What is Reinforcement Learning?</h3>
+    <p>Reinforcement Learning (RL) is a type of machine learning where an <strong>agent</strong> learns to make
+        decisions by interacting with an <strong>environment</strong>. The agent receives <strong>rewards</strong> or
+        <strong>penalties</strong> based on its actions and uses this feedback to improve future decisions.
+    </p>
+
+    <ul>
+        <li><strong>Agent</strong>: The decision-maker (our trading bot)</li>
+        <li><strong>Environment</strong>: The market conditions (price, volatility, trend)</li>
+        <li><strong>State</strong>: A representation of the current market situation</li>
+        <li><strong>Action</strong>: What the agent can do (CALL, PUT, HOLD)</li>
+        <li><strong>Reward</strong>: Feedback signal (+1 for correct prediction, -1 for incorrect)</li>
+    </ul>
+
+    <h3>2.2 Why Q-Learning for Trading?</h3>
+    <ol>
+        <li><strong>Model-Free</strong>: It doesn't require a mathematical model of the market</li>
+        <li><strong>Adaptive</strong>: It learns from experience and adapts to changing conditions</li>
+        <li><strong>Exploratory</strong>: It balances trying new strategies vs. exploiting known good ones</li>
+    </ol>
+
+    <h2>3. The Q-Learning Algorithm</h2>
+
+    <h3>3.1 Core Concept</h3>
+    <p>Q-Learning assigns a <strong>Q-value</strong> (Quality value) to each state-action pair. This value represents
+        the expected future reward of taking a particular action in a given state.</p>
+
+    <div class="note">
+        <strong>The Q-Value Update Formula:</strong><br><br>
+        <code>Q(s, a) ← Q(s, a) + α × [R + γ × max Q(s', a') - Q(s, a)]</code>
+    </div>
+
+    <ul>
+        <li><code>Q(s, a)</code> = Current Q-value for state <code>s</code> and action <code>a</code></li>
+        <li><code>α</code> (alpha) = Learning rate (0.1 in our implementation)</li>
+        <li><code>R</code> = Reward received after taking action <code>a</code></li>
+        <li><code>γ</code> (gamma) = Discount factor (0.9 in our implementation)</li>
+        <li><code>max Q(s', a')</code> = Maximum Q-value for the next state</li>
+    </ul>
+
+    <h3>3.2 Learning Parameters</h3>
+    <p>We use specific parameters to balance stability and speed:</p>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><strong>Learning Rate (α)</strong></td>
+            <td>0.1</td>
+            <td>Balanced approach for gradual improvement. avoids instability.</td>
+        </tr>
+        <tr>
+            <td><strong>Discount Factor (γ)</strong></td>
+            <td>0.9</td>
+            <td>Strong consideration for future outcomes rather than just immediate rewards.</td>
+        </tr>
+    </table>
+
+    <h2>4. The Q-Matrix (Q-Table)</h2>
+
+    <h3>4.1 Structure</h3>
+    <p>The Q-Matrix is a table that stores Q-values for every possible state-action combination. In our trading bot, the
+        Q-Matrix has the following structure:</p>
+
+    <table>
+        <tr>
+            <th>State</th>
+            <th>CALL</th>
+            <th>PUT</th>
+            <th>HOLD</th>
+        </tr>
+        <tr>
+            <td><strong>BULLISH</strong></td>
+            <td>0.50</td>
+            <td>-0.20</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td><strong>BEARISH</strong></td>
+            <td>-0.30</td>
+            <td>0.60</td>
+            <td>0.10</td>
+        </tr>
+        <tr>
+            <td><strong>SIDEWAYS</strong></td>
+            <td>0.10</td>
+            <td>0.10</td>
+            <td>0.40</td>
+        </tr>
+    </table>
+
+    <h3>4.2 States Explained</h3>
+    <p>The bot classifies market conditions into three primary states:</p>
+    <table>
+        <tr>
+            <th>State</th>
+            <th>Condition</th>
+            <th>Optimal Action</th>
+        </tr>
+        <tr>
+            <td><strong>BULLISH</strong></td>
+            <td>Price rising (`change > threshold` AND `RSI < 75`)</td>
+            <td>CALL (Win if price goes UP)</td>
+        </tr>
+        <tr>
+            <td><strong>BEARISH</strong></td>
+            <td>Price falling (`change < -threshold` AND `RSI> 25`)</td>
+            <td>PUT (Win if price goes DOWN)</td>
+        </tr>
+        <tr>
+            <td><strong>SIDEWAYS</strong></td>
+            <td>Price change is within threshold</td>
+            <td>HOLD (Wait)</td>
+        </tr>
+    </table>
+
+    <h3>4.3 Actions Explained</h3>
+    <table>
+        <tr>
+            <th>Action</th>
+            <th>Description</th>
+            <th>When to Use</th>
+        </tr>
+        <tr>
+            <td><strong>CALL</strong></td>
+            <td>Predict price will go UP</td>
+            <td>Bullish market conditions</td>
+        </tr>
+        <tr>
+            <td><strong>PUT</strong></td>
+            <td>Predict price will go DOWN</td>
+            <td>Bearish market conditions</td>
+        </tr>
+        <tr>
+            <td><strong>HOLD</strong></td>
+            <td>Skip this trade</td>
+            <td>Uncertain/sideways market</td>
+        </tr>
+    </table>
+
+    <h3>4.4 How Q-Values are Interpreted</h3>
+    <ul>
+        <li><strong>Positive Q-value (e.g., +0.60)</strong>: Taking this action in this state has historically led to
+            profits</li>
+        <li><strong>Negative Q-value (e.g., -0.30)</strong>: Taking this action in this state has historically led to
+            losses</li>
+        <li><strong>Near-zero Q-value</strong>: The outcome is uncertain or neutral</li>
+    </ul>
+
+    <h3>4.5 Initial Q-Values</h3>
+    <p>The Q-Matrix is initialized with sensible default values based on trading intuition:</p>
+    <pre>
+{
+    BULLISH:  { CALL: 0.50, PUT: -0.20, HOLD: 0.10 },
+    BEARISH:  { CALL: -0.30, PUT: 0.60, HOLD: 0.10 },
+    SIDEWAYS: { CALL: 0.10, PUT: 0.10, HOLD: 0.40 }
+}
+    </pre>
+    <p>These defaults encode common-sense rules to "jump start" the learning process:</p>
+    <ul>
+        <li>In BULLISH markets, CALL is preferred (+0.50)</li>
+        <li>In BEARISH markets, PUT is preferred (+0.60)</li>
+        <li>In SIDEWAYS markets, HOLD is preferred (+0.40)</li>
+    </ul>
+
+    <h2>5. Double Deep Q-Network (DDQN)</h2>
+
+    <h3>5.1 The Problem with Standard Q-Learning</h3>
+    <p>Standard Q-Learning can <strong>overestimate</strong> Q-values because the same network is used to both select
+        and evaluate actions. This creates a positive feedback loop that inflates values.</p>
+
+    <h3>5.2 DDQN Solution: Two Networks</h3>
+    <table>
+        <tr>
+            <th>Network</th>
+            <th>Role</th>
+            <th>Update Frequency</th>
+        </tr>
+        <tr>
+            <td><strong>Main Network (Live Net A)</strong></td>
+            <td>Selects the best action</td>
+            <td>Every Step (Real-time)</td>
+        </tr>
+        <tr>
+            <td><strong>Target Network (Target Net B)</strong></td>
+            <td>Evaluates the value of that action</td>
+            <td>Every ~20 Epochs</td>
+        </tr>
+    </table>
+
+    <h3>5.3 Sync Process</h3>
+    <p>The Target Network is synchronized from the Main Network every ~20 epochs to prevent instability.</p>
+    <pre>
+Sync Progress: [████████████████████] 100%
+→ Target Network B updated from Main Network A
+    </pre>
+
+    <h2>6. Experience Replay</h2>
+
+    <h3>6.1 What is Experience Replay?</h3>
+    <p>Instead of learning from experiences immediately (which causes correlation issues), the bot stores experiences in
+        a <strong>Replay Buffer</strong> and samples random batches for training.</p>
+
+    <h3>6.2 Experience Structure</h3>
+    <p>Each experience contains:</p>
+    <pre>
+{
+    state: "BULLISH",      // Market state when decision was made
+    action: "CALL",        // Action taken
+    reward: +1.0,          // Outcome (+1 win, -1 loss)
+    nextState: "BULLISH"   // Market state after action
+}
+    </pre>
+
+    <h3>6.3 Buffer Configuration</h3>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>MAX_MEMORY</td>
+            <td>2000</td>
+            <td>Maximum separate experiences stored</td>
+        </tr>
+        <tr>
+            <td>BATCH_SIZE</td>
+            <td>64</td>
+            <td>Number of experiences sampled per training step</td>
+        </tr>
+        <tr>
+            <td>MIN_REPLAY_SIZE</td>
+            <td>64</td>
+            <td>Minimum buffer size before training begins</td>
+        </tr>
+    </table>
+
+    <h3>6.4 Benefits of Experience Replay</h3>
+    <ol>
+        <li><strong>Breaks Correlation</strong>: Random sampling prevents learning from sequential patterns</li>
+        <li><strong>Efficient Data Use</strong>: Each experience can be used multiple times</li>
+        <li><strong>Stable Learning</strong>: Smooths out the learning process</li>
+    </ol>
+
+    <h2>7. Trading Strategy: Epsilon-Greedy</h2>
+
+    <h3>7.1 The Explore vs. Exploit Dilemma</h3>
+    <p>The bot must balance <strong>Exploitation</strong> (using known successful strategies) with
+        <strong>Exploration</strong> (trying new actions to discover better strategies).
+    </p>
+
+    <h3>7.2 Epsilon-Greedy Implementation</h3>
+    <p><code>ε (epsilon) = 0.10 (10%)</code></p>
+    <p><strong>Decision Process:</strong></p>
+    <ol>
+        <li>Generate random number between 0 and 1</li>
+        <li>If random < ε (10% chance): <strong>EXPLORE</strong> - choose random action</li>
+        <li>Else (90% chance): <strong>EXPLOIT</strong> - choose action with highest Q-value</li>
+    </ol>
+
+    <h3>7.3 Strategy Modes</h3>
+    <table>
+        <tr>
+            <th>Mode</th>
+            <th>Description</th>
+            <th>When Active</th>
+        </tr>
+        <tr>
+            <td><strong>GATHERING</strong></td>
+            <td>Collecting initial experiences</td>
+            <td>Buffer < 64 experiences</td>
+        </tr>
+        <tr>
+            <td><strong>EXPLORE</strong></td>
+            <td>Random action selection</td>
+            <td>10% of decisions</td>
+        </tr>
+        <tr>
+            <td><strong>EXPLOIT</strong></td>
+            <td>Best known action</td>
+            <td>90% of decisions</td>
+        </tr>
+    </table>
+
+    <h2>8. Reward Shaping</h2>
+
+    <h3>8.1 How Rewards are Calculated</h3>
+    <pre>
+if (action === 'HOLD') {
+    reward = -0.05;  // Small penalty for inaction
+} else {
+    if (prediction_correct) {
+        reward = 1.0 + magnitude_bonus - volatility_penalty;
+    } else {
+        reward = -1.0 - volatility_penalty;
+    }
+}
+    </pre>
+
+    <h3>8.2 Reward Components</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Value</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><strong>Base Win</strong></td>
+            <td>+1.0</td>
+            <td>Reinforce successful prediction</td>
+        </tr>
+        <tr>
+            <td><strong>Base Loss</strong></td>
+            <td>-1.0</td>
+            <td>Discourage incorrect prediction</td>
+        </tr>
+        <tr>
+            <td><strong>Hold Penalty</strong></td>
+            <td>-0.05</td>
+            <td>Discourages excessive waiting</td>
+        </tr>
+        <tr>
+            <td><strong>Magnitude Bonus</strong></td>
+            <td>Up to +0.5</td>
+            <td>Extra reward for catching strong trends</td>
+        </tr>
+        <tr>
+            <td><strong>Volatility Penalty</strong></td>
+            <td>Up to -0.2</td>
+            <td>Small penalty for trading in highly unpredictable markets</td>
+        </tr>
+    </table>
+
+    <h2>9. Dynamic Timeframe Selection</h2>
+    <h3>9.1 Adaptive Analysis Window</h3>
+    <p>The bot dynamically adjusts its analysis timeframe based on market volatility:</p>
+    <table>
+        <tr>
+            <th>Volatility Level</th>
+            <th>Timeframe</th>
+            <th>Reasoning</th>
+        </tr>
+        <tr>
+            <td><strong>High (> 0.8)</strong></td>
+            <td>15 seconds</td>
+            <td>Fast markets need quick decisions</td>
+        </tr>
+        <tr>
+            <td><strong>Medium (0.5-0.8)</strong></td>
+            <td>30 seconds</td>
+            <td>Balanced approach</td>
+        </tr>
+        <tr>
+            <td><strong>Low (< 0.5)</strong>
+            </td>
+            <td>60 seconds</td>
+            <td>Slower markets allow longer analysis</td>
+        </tr>
+    </table>
+
+    <h2>10. Data Persistence</h2>
+
+    <h3>10.1 What is Saved</h3>
+    <p>The bot persists its learning across sessions:</p>
+    <table>
+        <tr>
+            <th>Data</th>
+            <th>Storage Key</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><strong>Q-Matrix</strong></td>
+            <td><code>veltrex_q_table_{symbol}</code></td>
+            <td>Learned strategy</td>
+        </tr>
+        <tr>
+            <td><strong>Epoch Count</strong></td>
+            <td><code>veltrex_epoch_{symbol}</code></td>
+            <td>Training progress</td>
+        </tr>
+        <tr>
+            <td><strong>Replay Buffer</strong></td>
+            <td><code>veltrex_replay_buffer_{symbol}</code></td>
+            <td>Recent experiences</td>
+        </tr>
+    </table>
+
+    <h3>10.2 Auto-Save System</h3>
+    <ul>
+        <li><strong>Periodic Save</strong>: Every 5 seconds</li>
+        <li><strong>On Tab Close</strong>: <code>beforeunload</code> event</li>
+        <li><strong>On Logout</strong>: Component unmount</li>
+    </ul>
+
+    <h2>11. Technical Architecture</h2>
+
+    <h3>11.1 Technology Stack</h3>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Technology</th>
+        </tr>
+        <tr>
+            <td>Frontend</td>
+            <td>React 19 + TypeScript</td>
+        </tr>
+        <tr>
+            <td>Styling</td>
+            <td>Tailwind CSS</td>
+        </tr>
+        <tr>
+            <td>Desktop Framework</td>
+            <td>Tauri (Rust)</td>
+        </tr>
+        <tr>
+            <td>Build Tool</td>
+            <td>Vite</td>
+        </tr>
+        <tr>
+            <td>State Management</td>
+            <td>React Hooks (useState, useEffect, useRef)</td>
+        </tr>
+    </table>
+
+    <h3>11.2 Key Files</h3>
+    <table>
+        <tr>
+            <th>File</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td><code>TradingPanel.tsx</code></td>
+            <td>Contains Q-Learning implementation</td>
+        </tr>
+        <tr>
+            <td><code>App.tsx</code></td>
+            <td>Main application logic and trade execution</td>
+        </tr>
+        <tr>
+            <td><code>SettingsModal.tsx</code></td>
+            <td>User preferences and system info</td>
+        </tr>
+    </table>
+
+    <h3>11.3 Core Algorithm Snippet</h3>
+    <p>The following TypeScript code demonstrates the actual DDQN update logic used in the bot:</p>
+
+    <pre
+        style="background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; font-family: Consolas, 'Courier New', monospace; overflow-x: auto; border: 1px solid #333;">
+<span style="color: #6a9955;">// Experience Replay & Training Loop</span>
+trainingBatch.forEach(<span style="color: #9cdcfe;">exp</span> => {
+    <span style="color: #6a9955;">// 1. Get current Q-Value from Main Network</span>
+    <span style="color: #569cd6;">const</span> <span style="color: #9cdcfe;">currentQ</span> = newTable[exp.state][exp.action];
+    
+    <span style="color: #6a9955;">// 2. Select best next action using Main Network (A)</span>
+    <span style="color: #569cd6;">const</span> <span style="color: #9cdcfe;">nextStateValuesMain</span> = newTable[exp.nextState];
+    <span style="color: #569cd6;">const</span> <span style="color: #9cdcfe;">bestNextAction</span> = Object.keys(nextStateValuesMain)
+        .reduce((<span style="color: #9cdcfe;">a</span>, <span style="color: #9cdcfe;">b</span>) => nextStateValuesMain[a] > nextStateValuesMain[b] ? a : b);
+        
+    <span style="color: #6a9955;">// 3. Evaluate that action using Target Network (B) - DDQN Stability</span>
+    <span style="color: #569cd6;">const</span> <span style="color: #9cdcfe;">targetValue</span> = targetQTable[exp.nextState][bestNextAction];
+    
+    <span style="color: #6a9955;">// 4. Calculate Bellman Update</span>
+    <span style="color: #6a9955;">// Q(s,a) = Q(s,a) + alpha * (reward + gamma * Q(s',a') - Q(s,a))</span>
+    <span style="color: #569cd6;">const</span> <span style="color: #9cdcfe;">updatedQ</span> = currentQ + alpha * (exp.reward + gamma * targetValue - currentQ);
+    
+    <span style="color: #6a9955;">// 5. Update Q-Table</span>
+    newTable[exp.state][exp.action] = Number(updatedQ.toFixed(3));
+});</pre>
+
+    <h2>12. Glossary</h2>
+    <table>
+        <tr>
+            <th>Term</th>
+            <th>Definition</th>
+        </tr>
+        <tr>
+            <td><strong>Q-Value</strong></td>
+            <td>Expected future reward for a state-action pair</td>
+        </tr>
+        <tr>
+            <td><strong>Q-Matrix</strong></td>
+            <td>Table storing all Q-values</td>
+        </tr>
+        <tr>
+            <td><strong>Epoch</strong></td>
+            <td>One complete training iteration</td>
+        </tr>
+        <tr>
+            <td><strong>Replay Buffer</strong></td>
+            <td>Memory storing past experiences</td>
+        </tr>
+        <tr>
+            <td><strong>DDQN</strong></td>
+            <td>Double Deep Q-Network (stabilized Q-Learning)</td>
+        </tr>
+        <tr>
+            <td><strong>Epsilon</strong></td>
+            <td>Probability of exploration (random action)</td>
+        </tr>
+        <tr>
+            <td><strong>Alpha</strong></td>
+            <td>Learning rate (how fast the model updates)</td>
+        </tr>
+        <tr>
+            <td><strong>Gamma</strong></td>
+            <td>Discount factor (importance of future rewards)</td>
+        </tr>
+    </table>
+
+    <h2>13. Conclusion</h2>
+    <p>The Future Trading Bot demonstrates the practical application of reinforcement learning in financial markets. By
+        combining Q-Learning with modern techniques like DDQN and Experience Replay, the system achieves:</p>
+    <ol>
+        <li><strong>Autonomous Decision Making</strong>: No human intervention required</li>
+        <li><strong>Continuous Improvement</strong>: Learns from every trade</li>
+        <li><strong>Adaptive Strategy</strong>: Adjusts to changing market conditions</li>
+        <li><strong>Stable Learning</strong>: DDQN prevents value overestimation</li>
+    </ol>
+    <p>The Q-Matrix serves as the "brain" of the system, encoding learned trading wisdom that improves with each epoch
+        of training.</p>
+
+    <hr>
+    <p style="font-size: 0.9em; text-align: center; color: #777;">
+        Document Version 1.0 | Last Updated: December 2024<br>
+        <strong>Authors:</strong> Elmerio S. Talara, Trisha Ann Dahab, Venice Cabillada
+    </p>
+
+</body>
+
+</html>
