@@ -13,13 +13,9 @@ Veltrex is a professional-grade autonomous trading simulation system powered by 
 
 ---
 
-## 📸 Visual Demo
-
 ### Watch the Bot in Action
 
-<div align="center">
-  https://github.com/user-attachments/assets/87bfa959-7fa3-4009-932c-f4acacbcca78
-</div>
+https://github.com/user-attachments/assets/87bfa959-7fa3-4009-932c-f4acacbcca78
 
 > [!NOTE]
 > If the video does not play in your browser, you can find the source file at `veltrex-demo.mp4` in the root directory.
